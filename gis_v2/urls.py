@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path,include
 
 urlpatterns = [
+    path("",include("RESTapi.urls")),
     path('admin/', admin.site.urls),
     path("",include("Page.urls")),
     path("map/",include("MapPage.urls"))
