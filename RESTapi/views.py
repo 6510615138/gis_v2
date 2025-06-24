@@ -11,7 +11,7 @@ def is_numeric(text):
 
 def search_province(request):
     search_txt = request.GET.get("search","")
-    search_txt = search_txt.strip()[1:-1]  # remove the qoutes and space in txt  
+    search_txt = search_txt.replace("\"","")  # remove the qoutes and space in txt 
     if search_txt.isnumeric():
         print(f"search Province by code : {search_txt}")
         return search_province_by_code(code=search_txt)
@@ -25,7 +25,7 @@ def get_all_provinces(request):
 def search_district(request):
     province = request.GET.get("province","")
     search_txt = request.GET.get("search","")
-    search_txt = search_txt.strip()[1:-1]  
+    search_txt = search_txt.replace("\"","")  
     province = province.strip()[1:-1]       # remove the qoutes and space in txt  
     if search_txt.isnumeric():
         if len(search_txt) < 4 :
@@ -44,7 +44,7 @@ def search_subdistrict(request):
     province = request.GET.get("province","")
     district = request.GET.get("district","")
     search_txt = request.GET.get("search","")
-    search_txt = search_txt.strip()[1:-1]  # this was to remove the qoutes and space in the search_txt  
+    search_txt = search_txt.replace("\"","")  # this was to remove the qoutes and space in the search_txt  
     district = district.strip()[1:-1]  # this was to remove the qoutes and space in the search_txt  
     province = province.strip()[1:-1]  # this was to remove the qoutes and space in the search_txt  
     if search_txt.isnumeric():
@@ -58,7 +58,7 @@ def search_subdistrict(request):
 
 import ast
 def get_coordinates(request):
-    codes = request.GET.get("code","")
+    codes = request.GET.get("code","" )
     if codes == "":
         return JsonResponse("empty request",safe=False)
     try:

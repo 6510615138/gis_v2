@@ -18,8 +18,8 @@ def search_province_by_name(name: str, max_result=8):
             output_field=IntegerField(),
         )
     ).filter(name__icontains=name).order_by('priority', 'name')[:max_result]
-
     result = list(matched.values("code", "name"))
+    sorted(result, key=lambda item: item["name"]) 
     return JsonResponse(result, safe=False)
 
 def all_province():
