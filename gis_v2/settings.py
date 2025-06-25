@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'RESTapi',
     'Page',
-    'MapPage',
 ]
 
 MIDDLEWARE = [
