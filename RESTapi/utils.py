@@ -62,7 +62,7 @@ def generate_img(file:str):
     img = Image.open(buf)
     return img
 
-def create_polygon_from_JSON(file:str):
+def get_province_polygon(file:str):
 
     with open(file, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -84,49 +84,86 @@ def create_polygon_from_JSON(file:str):
     polygon = Polygon(plot_coordinate)#create polygon
     return polygon
 
+
+def get_district_polygon(file:str):
+
+    with open(file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # processing data for the plot
+    center_lat = float(data['coordinates'][0]['center']['lat'])
+    center_lng = float(data['coordinates'][0]['center']['lng'])
+
+    print(f"lat : {center_lat}  lng : {center_lng}")
+
+    coordinates = data['coordinates'][0]['coor']
+
+    plot_coordinate = [] #A list of tuple
+    for point in coordinates:
+            point_tuple = (point['lat'], point['lng'])
+            plot_coordinate.append(point_tuple)
+
+    polygon = Polygon(plot_coordinate)#create polygon
+    return polygon
+
 def merge_polygon(poly1,poly2):
     mergedPolys = unary_union([poly1,poly2])
-    print(mergedPolys)
     return mergedPolys
 
 def merge_polygon_list(pols):
     mergedPolys = unary_union(pols)
-    print(mergedPolys)
     return mergedPolys
 
-# shapely.to_geojson(merge_polygon_list([p1,p2]))
 import glob
 import os
+
 #code of regions ex [10,12,14,16]
 def get_union_coordinates(regions):
+    from .models import Province, District, Subdistrict 
     list_of_regions_polygons = []    
+
     for code in regions:
         root = "data/"
+        code_str = str(code)
 
-        if len(str(code)) == 2:
+        if len(code_str) == 2:
             root += "province_coordinates/"
-        elif len(str(code)) == 4:
+            model = Province
+        elif len(code_str) == 4:
             root += "district_coordinates/"
-        elif len(str(code)) == 6:
+            model = District
+        elif len(code_str) == 6:
             root += "subdistrict_coordinates/"
+            model = Subdistrict
         else:
-            print(f"wrong province code! {code}")
+            print(f"Invalid area code: {code}")
             continue
-        
-        try:
-            province = Province.objects.get(code=code)
-        except:
-            raise ValueError(f"province not found {code}")
 
-        pattern = os.path.join(root, f"{province.code}*")
+        try:
+            area = model.objects.get(code=code)
+        except model.DoesNotExist:
+            print(f"{model.__name__} not found for code {code}")
+
+        # Find and parse JSON file
+        pattern = os.path.join(root, f"{area.code}*")
         matches = glob.glob(pattern)
 
         if not matches:
-            raise FileNotFoundError(f"No file found for pattern: {pattern}")
-        
-        filename = matches[0]  # take the first match
-        polygon = create_polygon_from_JSON(filename)
-        list_of_regions_polygons.append(polygon)
+            print(f"No file found for pattern: {pattern}")
 
+        try:
+            filename = matches[0]  # use first match
+        except  Exception as e:
+            print(f"Polygon coordinates not founf for {area.code}: {e}")
+        try:
+            if model is Province:
+                polygon = get_province_polygon(filename)
+            else:
+                polygon = get_district_polygon(filename)
+            list_of_regions_polygons.append(polygon)
+        except Exception as e:
+            print(f"Failed to create polygon for {area.code}: {e}")
+
+    # Merge and return hGeoJSON
     merged = merge_polygon_list(list_of_regions_polygons)
     return shapely.to_geojson(merged)

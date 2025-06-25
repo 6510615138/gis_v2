@@ -58,16 +58,21 @@ def search_subdistrict(request):
 
 import ast
 def get_coordinates(request):
-    codes = request.GET.get("code","" )
-    if codes == "":
-        return JsonResponse("empty request",safe=False)
-    try:
-        lst = ast.literal_eval(codes)[1:-1]
-        lst = lst.split(",")
-    except:
-        return JsonResponse("bad request",safe=False)
 
-    coor_json = get_union_coordinates(lst) #codes = [10,1201,120102,...]
-    return JsonResponse(coor_json,safe=False)
+    code_str = request.GET.get("code", "")
+    code_str = code_str.replace("\"","")
+    print(f"coordinate of code: {code_str}")
+
+    if not code_str:
+        return JsonResponse("empty request", safe=False)
+    try:
+        code_list = [int(code.strip()) for code in code_str.split(',')]
+    except ValueError:
+        return JsonResponse("bad request", safe=False)
+
+    print(f"lst: {code_list} ({type(code_list)})")
+    coor_json = get_union_coordinates(code_list)
+    return JsonResponse(coor_json, safe=False)
+
 
     
