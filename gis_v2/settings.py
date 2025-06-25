@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-v=j4*rrkv!$p=i()0f*7s9@42%&k4=tf(n=qos4okwnkx2l5ez
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost',"127.0.0.1"]
+ALLOWED_HOSTS = ['localhost',"127.0.0.1","127.0.0.1:3000"]
 
 
 # Application definition
@@ -52,8 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-     "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'gis_v2.urls'
@@ -137,8 +137,5 @@ REST_FRAMEWORK = {
     ]
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:8000",
-]
+
+CORS_ORIGIN_ALLOW_ALL = True
