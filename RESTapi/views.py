@@ -75,4 +75,20 @@ def get_coordinates(request):
     return JsonResponse(coor_json, safe=False)
 
 
-    
+
+from .business import find_business_from_code
+def get_factory(request):
+    code_str = request.GET.get("code", "")
+    code_str = code_str.replace("\"","")
+    print(f"coordinate of code: {code_str}")
+
+    if not code_str:
+        return JsonResponse("empty request", safe=False)
+    try:
+        code_list = [int(code.strip()) for code in code_str.split(',')]
+    except ValueError:
+        return JsonResponse("bad request", safe=False)
+
+    print(f"lst: {code_list} ({type(code_list)})")
+    factories = find_business_from_code(code_list)
+    return JsonResponse(factories, safe=False)

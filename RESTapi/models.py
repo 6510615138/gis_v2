@@ -20,7 +20,7 @@ class District(models.Model):
 
 class Factory(models.Model):
     name = models.TextField(blank=True, null=True)
-    registration_num = models.TextField( blank=True, null=True)
+    registration_num = models.TextField(primary_key=True)
     type = models.TextField(blank=True, null=True)
     standard = models.TextField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
