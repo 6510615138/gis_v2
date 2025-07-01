@@ -62,9 +62,9 @@ def search_district_by_name(name:str,province:str,max_result=8):
 
 
 #Subdistrict
-def search_subdistrict_by_code(search:str):
+def search_subdistrict_by_code(code:str):
     try:
-        matched = Subdistrict.objects.filter(code__icontains=search)[0]
+        matched = Subdistrict.objects.filter(code__icontains=code)[0]
         result = list(matched.values("code", "name"))
         return JsonResponse(result, safe=False)
     except:

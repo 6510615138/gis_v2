@@ -71,7 +71,7 @@ def get_coordinates(request):
         return JsonResponse("bad request", safe=False)
 
     print(f"lst: {code_list} ({type(code_list)})")
-    coor_json = get_union_coordinates(code_list)
+    coor_json = get_polygon_coordinates_detailed(code_list)
     return JsonResponse(coor_json, safe=False)
 
 

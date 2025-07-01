@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'RESTapi',
     'Page',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [

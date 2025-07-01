@@ -2,10 +2,11 @@ import json
 import matplotlib.pyplot as plt
 import shapely
 from shapely import unary_union
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon,MultiPolygon, mapping
 import io
 from PIL import Image
 from .search import *
+from .models import Province, District, Subdistrict 
 def generate_img(file:str):
 
     with open(file, "r", encoding="utf-8") as f:
@@ -119,7 +120,6 @@ import os
 
 #code of regions ex [10,12,14,16]
 def get_union_coordinates(regions):
-    from .models import Province, District, Subdistrict 
     list_of_regions_polygons = []    
 
     for code in regions:
@@ -167,3 +167,129 @@ def get_union_coordinates(regions):
     # Merge and return hGeoJSON
     merged = merge_polygon_list(list_of_regions_polygons)
     return shapely.to_geojson(merged)
+
+def get_polygon_coordinates_corse(regions):
+    list_of_polygons = []
+
+    for code in regions:
+        root = "data/"
+        code_str = str(code)
+
+        if len(code_str) == 2:
+            root += "province_coordinates/"
+            model = Province
+        elif len(code_str) == 4:
+            root += "district_coordinates/"
+            model = District
+        elif len(code_str) == 6:
+            root += "subdistrict_coordinates/"
+            model = Subdistrict
+        else:
+            print(f"Invalid area code: {code}")
+            continue
+
+        try:
+            area = model.objects.get(code=code)
+        except model.DoesNotExist:
+            print(f"{model.__name__} not found for code {code}")
+            continue
+
+        pattern = os.path.join(root, f"{area.code}*")
+        matches = glob.glob(pattern)
+
+        if not matches:
+            print(f"No file found for pattern: {pattern}")
+            continue
+
+        filename = matches[0]
+        try:
+            if model is Province:
+                polygon = get_province_polygon(filename)
+            else:
+                polygon = get_district_polygon(filename)
+
+            if isinstance(polygon, (Polygon, MultiPolygon)):
+                list_of_polygons.append(polygon)
+        except Exception as e:
+            print(f"Failed to create polygon for {area.code}: {e}")
+            continue
+
+    # Remove inner polygons
+    non_contained = []
+    for i, poly in enumerate(list_of_polygons):
+        is_inside = False
+        for j, other in enumerate(list_of_polygons):
+            if i != j and poly.within(other):
+                is_inside = True
+                break
+        if not is_inside:
+            non_contained.append(poly)
+
+    if not non_contained:
+        return None
+
+    # Merge polygons
+    merged = unary_union(non_contained)
+
+    # Convert to GeoJSON
+    return shapely.to_geojson(merged)
+
+def get_polygon_coordinates_detailed(regions):
+    list_of_regions_polygons = []    
+
+    for code in regions:
+        root = "data/"
+        code_str = str(code)
+
+        if len(code_str) == 2:
+            root += "province_coordinates/"
+            model = Province
+        elif len(code_str) == 4:
+            root += "district_coordinates/"
+            model = District
+        elif len(code_str) == 6:
+            root += "subdistrict_coordinates/"
+            model = Subdistrict
+        else:
+            print(f"Invalid area code: {code}")
+            continue
+
+        try:
+            area = model.objects.get(code=code)
+        except model.DoesNotExist:
+            print(f"{model.__name__} not found for code {code}")
+
+        # Find and parse JSON file
+        pattern = os.path.join(root, f"{area.code}*")
+        matches = glob.glob(pattern)
+
+        if not matches:
+            print(f"No file found for pattern: {pattern}")
+
+        try:
+            filename = matches[0]  # use first match
+        except  Exception as e:
+            print(f"Polygon coordinates not founf for {area.code}: {e}")
+        try:
+            if model is Province:
+                polygon = get_province_polygon(filename)
+            else:
+                polygon = get_district_polygon(filename)
+            list_of_regions_polygons.append(polygon)
+        except Exception as e:
+            print(f"Failed to create polygon for {area.code}: {e}")
+
+    # Merge and return hGeoJSON
+    print(f"{list_of_regions_polygons} tpye : {type(list_of_regions_polygons)}")
+    merged = polygons_to_multipolygon(list_of_regions_polygons)
+    return shapely.to_geojson(merged)
+
+
+
+def polygons_to_multipolygon(polygons):
+    # Make sure all polygons are Polygon or MultiPolygon objects
+    print(f"polygons len : {len(polygons)}")
+    for poly in polygons:
+        print(f"type : {type(poly)}")
+    multipolygon = MultiPolygon(polygons)
+    return  multipolygon
