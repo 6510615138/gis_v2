@@ -81,7 +81,5 @@ def find_business_from_code(codes):
             "lat": factory.lat,
             "long": factory.long
         })
-
-    print(matched_factories)
     print(f"Matched factories: {len(matched_factories)}")
     return matched_factories

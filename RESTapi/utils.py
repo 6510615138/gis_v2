@@ -63,8 +63,7 @@ def generate_img(file:str):
     img = Image.open(buf)
     return img
 
-def get_province_polygon(file:str):
-
+def get_province_polygon(file):
     with open(file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -73,17 +72,15 @@ def get_province_polygon(file:str):
     center_lng = float(data['center']['lng'])
 
     coordinates = data['coordinates']
-
+    len(coordinates)
     plot_coordinate = [] #A list of tuple
     for blob in coordinates:
+        island = []
         for point in blob:
-            point_tuple = (point['lat'], point['lng'])
-            #print(point_tuple)  #debug
-            plot_coordinate.append(point_tuple)
-
-
-    polygon = Polygon(plot_coordinate)#create polygon
-    return polygon
+            point_tuple = (point['lat'],point['lng'])
+            island.append(point_tuple)
+        plot_coordinate.append(Polygon(island))
+    return MultiPolygon(plot_coordinate)#create polygon
 
 
 def get_district_polygon(file:str):
@@ -100,11 +97,15 @@ def get_district_polygon(file:str):
     coordinates = data['coordinates'][0]['coor']
 
     plot_coordinate = [] #A list of tuple
-    for point in coordinates:
-            point_tuple = (point['lat'], point['lng'])
-            plot_coordinate.append(point_tuple)
+    for blob in coordinates:
+        island = []
+        for point in blob:
+            point_tuple = (point['lat'],point['lng'])
+            island.append(point_tuple)
+        plot_coordinate.append(Polygon(island))
 
-    polygon = Polygon(plot_coordinate)#create polygon
+
+    polygon = MultiPolygon(plot_coordinate)#create polygon
     return polygon
 
 def merge_polygon(poly1,poly2):
@@ -234,6 +235,21 @@ def get_polygon_coordinates_corse(regions):
     # Convert to GeoJSON
     return shapely.to_geojson(merged)
 
+def combine_polygons(list_of_regions_polygons):
+    # Flatten all Polygons and MultiPolygons into one list of Polygons
+    all_polygons = []
+    for geom in list_of_regions_polygons:
+        if isinstance(geom, Polygon):
+            all_polygons.append(geom)
+        elif isinstance(geom, MultiPolygon):
+            all_polygons.extend(list(geom.geoms))
+
+    # Merge them into a single geometry
+    merged = unary_union(all_polygons)
+
+    # Convert to GeoJSON
+    return merged
+
 def get_polygon_coordinates_detailed(regions):
     list_of_regions_polygons = []    
 
@@ -281,15 +297,8 @@ def get_polygon_coordinates_detailed(regions):
 
     # Merge and return hGeoJSON
     print(f"{list_of_regions_polygons} tpye : {type(list_of_regions_polygons)}")
-    merged = polygons_to_multipolygon(list_of_regions_polygons)
+    merged =  combine_polygons(list_of_regions_polygons)
     return shapely.to_geojson(merged)
 
 
 
-def polygons_to_multipolygon(polygons):
-    # Make sure all polygons are Polygon or MultiPolygon objects
-    print(f"polygons len : {len(polygons)}")
-    for poly in polygons:
-        print(f"type : {type(poly)}")
-    multipolygon = MultiPolygon(polygons)
-    return  multipolygon
