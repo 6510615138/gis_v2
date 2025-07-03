@@ -29,7 +29,6 @@ def get_province_polygon(file):
     print(f"returned {file} as a MultiPolygon")
     return MultiPolygon(island)#create Multipolygon in case of multiple landmass
 
-
 def get_district_polygon(file:str):
 
     with open(file, "r", encoding="utf-8") as f:
@@ -43,17 +42,15 @@ def get_district_polygon(file:str):
     island = [] #A list of tuple
     for blob in coordinates:
         plot_coordinate = []
-        for point in blob["coor"]:
+        for point in blob['coor']:
             point_tuple = (point['lat'],point['lng'])
             plot_coordinate.append(point_tuple)
-        island.append(Polygon(island))
+        island.append(Polygon(plot_coordinate))
     if len(island) == 1:
         print(f"returned {file} as a Polygon")
         return Polygon(island[0])#create polygon
     print(f"returned {file} as a MultiPolygon")
     return MultiPolygon(island)#create Multipolygon in case of multiple landmass
-
-
 
 def get_polygon_coordinates_detailed(regions):
     list_of_regions_polygons = []    
