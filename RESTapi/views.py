@@ -92,3 +92,21 @@ def get_factory(request):
     print(f"lst: {code_list} ({type(code_list)})")
     factories = find_business_from_code(code_list)
     return JsonResponse(factories, safe=False)
+
+from .models import FactoryType
+def get_factory_type(request):
+    query = request.GET.get("type", "").replace("\"", "").strip()
+    if not query:
+        return JsonResponse({"error": "Missing 'type' parameter."}, status=400)
+    if query.isdigit():
+        factory_types = FactoryType.objects.filter(code=query)
+    else:
+        factory_types = FactoryType.objects.filter(type__icontains=query)
+    result = [
+        {
+            "code": ft.code,
+            "type": ft.type
+        } for ft in factory_types
+    ][:8]
+
+    return JsonResponse(result, safe=False)
