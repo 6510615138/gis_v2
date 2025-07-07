@@ -2,7 +2,7 @@ import json
 import shapely
 from shapely import unary_union
 from shapely.geometry import Polygon,MultiPolygon,mapping
-from .search import *
+from .ProvinceSearch import *
 from .models import Province, District, Subdistrict 
 import glob
 import os

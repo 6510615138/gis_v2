@@ -1,4 +1,4 @@
-from .utils import get_union_coordinates
+from .MapBorderLoad import get_union_coordinates
 from .models import Province,District,Subdistrict
 from .models import Factory  # factory contain lat , lng field represent latitute and longtitute of the factory
 # Expects code to be in format list ex [10,12,14,16]
