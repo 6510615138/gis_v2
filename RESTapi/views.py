@@ -1,6 +1,6 @@
 
-from .search import *
-from .utils import *
+from .ProvinceSearch import *
+from .MapBorderLoad import *
 
 def is_numeric(text):
     try:
@@ -76,12 +76,15 @@ def get_coordinates(request):
 
 
 
-from .business import find_business_from_code
+from .BuisinessSearch import find_business_from_code
 def get_factory(request):
     code_str = request.GET.get("code", "")
     code_str = code_str.replace("\"","")
-    print(f"coordinate of code: {code_str}")
 
+    factory_type = request.GET.get("type", "")
+    factory_type = code_str.replace("\"","")
+
+    print(f"coordinate of code: {code_str} ,type : {factory_type}")
     if not code_str:
         return JsonResponse("empty request", safe=False)
     try:
@@ -90,7 +93,7 @@ def get_factory(request):
         return JsonResponse("bad request", safe=False)
 
     print(f"lst: {code_list} ({type(code_list)})")
-    factories = find_business_from_code(code_list)
+    factories = find_business_from_code(code_list,factory_type)
     return JsonResponse(factories, safe=False)
 
 from .models import FactoryType

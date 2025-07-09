@@ -1,6 +1,6 @@
 from .MapBorderLoad import get_union_coordinates
 from .models import Province,District,Subdistrict
-from .models import Factory  # factory contain lat , lng field represent latitute and longtitute of the factory
+from .models import FactoryCoordinates  # factory contain lat , lng field represent latitute and longtitute of the factory
 # Expects code to be in format list ex [10,12,14,16]
 from shapely.geometry import shape, Point, Polygon
 import shapely
@@ -17,7 +17,7 @@ def find_business_from_code_coor(codes):
     json_dict = json.loads(geojson)
     polygon = shape(json_dict)  # convert GeoJSON to shapely Polygon
 
-    factories = Factory.objects.all()
+    factories = FactoryCoordinates.objects.all()
     matched_factories = []
 
     error = 0
@@ -27,7 +27,7 @@ def find_business_from_code_coor(codes):
         try:
             point = Point(lat,long) 
             if polygon.contains(point):
-                factory_data = list(Factory.objects.values("registration_num","name", "lat", "long"))
+                factory_data = list(FactoryCoordinates.objects.values("registration_num","name", "lat", "long"))
                 matched_factories.append(factory_data)
         except Exception as e:
             error += 1
@@ -39,7 +39,7 @@ def find_business_from_code_coor(codes):
 
 
 
-def find_business_from_code(codes):
+def find_business_from_code(codes,factory_type):
     if not codes:
         return []
     
@@ -66,11 +66,13 @@ def find_business_from_code(codes):
 
 
 
-    factories = Factory.objects.filter(
+    factories = FactoryCoordinates.objects.filter(
         Q(province__in=area['province']) |
         Q(district__in=area['district']) |
         Q(subdistrict__in=area['subdistrict'])
     ).distinct()
+
+    factories = factories.filter(Q(type__in=factory_type))
 
     matched_factories = []
 
@@ -79,7 +81,7 @@ def find_business_from_code(codes):
             "registration_num": factory.registration_num,
             "name": factory.name,
             "lat": factory.lat,
-            "long": factory.long
+            "long": factory.lng
         })
     print(f"Matched factories: {len(matched_factories)}")
     return matched_factories
