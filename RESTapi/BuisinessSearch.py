@@ -2,10 +2,11 @@ from .MapBorderLoad import get_union_coordinates
 from .models import Province,District,Subdistrict
 from .models import FactoryCoordinates  # factory contain lat , lng field represent latitute and longtitute of the factory
 # Expects code to be in format list ex [10,12,14,16]
-from shapely.geometry import shape, Point, Polygon
-import shapely
+from shapely.geometry import shape, Point
 import json
 from django.db.models import Q
+from django.db.models import CharField
+from django.db.models.functions import Cast
 
 def find_business_from_code_coor(codes):
     if not codes:
@@ -72,7 +73,8 @@ def find_business_from_code(codes,factory_type):
         Q(subdistrict__in=area['subdistrict'])
     ).distinct()
 
-    factories = factories.filter(Q(type__in=factory_type))
+    factories = factories.annotate(type_str=Cast('type', CharField())
+    ).filter(type_str__startswith=factory_type)
 
     matched_factories = []
 
@@ -83,5 +85,6 @@ def find_business_from_code(codes,factory_type):
             "lat": factory.lat,
             "long": factory.lng
         })
+    print(f"factory search code: {code} ,factory_type: {factory_type}")
     print(f"Matched factories: {len(matched_factories)}")
     return matched_factories

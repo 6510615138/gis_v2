@@ -82,8 +82,7 @@ def get_factory(request):
     code_str = code_str.replace("\"","")
 
     factory_type = request.GET.get("type", "")
-    factory_type = code_str.replace("\"","")
-
+    factory_type = factory_type.replace("\"","").lstrip("0")
     print(f"coordinate of code: {code_str} ,type : {factory_type}")
     if not code_str:
         return JsonResponse("empty request", safe=False)
@@ -91,9 +90,12 @@ def get_factory(request):
         code_list = [int(code.strip()) for code in code_str.split(',')]
     except ValueError:
         return JsonResponse("bad request", safe=False)
-
     print(f"lst: {code_list} ({type(code_list)})")
-    factories = find_business_from_code(code_list,factory_type)
+    try:
+        factories = find_business_from_code(code_list,factory_type)
+    except:
+        print(f"error fetching factory from code")
+        print(f"code: {code_list}, type={factory_type}")
     return JsonResponse(factories, safe=False)
 
 from .models import FactoryType

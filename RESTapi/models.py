@@ -186,8 +186,8 @@ class Factory(models.Model):
 
 class Factory2(models.Model):
     name = models.TextField(blank=True, null=True)
-    registration_num = models.TextField(blank=True, null=True)
-    type = models.FloatField(blank=True, null=True)
+    registration_num = models.TextField(primary_key=True)
+    type = models.TextField(blank=True, null=True)
     standard = models.TextField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     subdistrict = models.TextField(blank=True, null=True)
