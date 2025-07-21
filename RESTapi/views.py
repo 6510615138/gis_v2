@@ -99,6 +99,7 @@ def get_factory(request):
     return JsonResponse(factories, safe=False)
 
 from .models import FactoryType
+
 def get_factory_type(request):
     query = request.GET.get("type", "").replace("\"", "").strip()
     if not query:
@@ -115,3 +116,15 @@ def get_factory_type(request):
     ][:8]
 
     return JsonResponse(result, safe=False)
+
+def get_ev(request):
+
+    #get vendot eg, evme pttvolta etc.
+    vendor = request.GET.get("vendor", "").strip()
+
+    #get position 
+    #expect position in format like "13.123,100.456"
+    position = request.GET.get("position", "").strip()
+    lat, long = map(float, position.split(",")) 
+
+
