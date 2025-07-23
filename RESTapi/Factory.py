@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.db.models import CharField
 from django.db.models.functions import Cast
 
-def find_business_from_code_coor(codes):
+def find_factory_from_code_coor(codes):
     if not codes:
         return []
 
@@ -40,7 +40,7 @@ def find_business_from_code_coor(codes):
 
 
 
-def find_business_from_code(codes,factory_type):
+def find_factory_from_code(codes,factory_type):
     if not codes:
         return []
     

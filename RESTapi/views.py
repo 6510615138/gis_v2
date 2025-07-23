@@ -76,7 +76,7 @@ def get_coordinates(request):
 
 
 
-from .BuisinessSearch import find_business_from_code
+from .Factory import find_factory_from_code
 def get_factory(request):
     code_str = request.GET.get("code", "")
     code_str = code_str.replace("\"","")
@@ -92,7 +92,7 @@ def get_factory(request):
         return JsonResponse("bad request", safe=False)
     print(f"lst: {code_list} ({type(code_list)})")
     try:
-        factories = find_business_from_code(code_list,factory_type)
+        factories = find_factory_from_code(code_list,factory_type)
     except:
         print(f"error fetching factory from code")
         print(f"code: {code_list}, type={factory_type}")
@@ -128,3 +128,88 @@ def get_ev(request):
     lat, long = map(float, position.split(",")) 
 
 
+def get_store(request):
+    code_str = request.GET.get("code", "")
+    code_str = code_str.replace("\"","")
+    print(code_str)
+
+    #store_str use as a filter for query the store by store franchise name 
+    #expected to be string seperated be comma in format "store1,store2,store3" such as "Makro,7-11,Lawson"
+    #options for store can be as follow
+    # options: [
+    #         'CP'
+    #         'PurePharmacy'
+    #         'CentralFoodHall'
+    #         'Eathai'
+    #         'Healthiful'
+    #         'BigCFoodPlace'
+    #         '7-11'
+    #         'FamilyMart'
+    #         'Lawson'
+    #         'Jiffy'
+    #         'CJ_Express'
+    #         'MaxValuTanjai'
+    #         'Freshmart'
+    #         'TopSmall'
+    #         'Big_mini'
+    #         'TescoSmall'
+    #         'Villa'
+    #         'CJ_Supermarket'
+    #         'MaxValu'
+    #         'TopSuper'
+    #         'BigC_Super'
+    #         'TescoSuper'
+    #         'BigC_Hyper'
+    #         'TescoHyper'
+    #         'Makro'
+    # ]
+    
+    store_str = request.GET.get("store", "")
+    store_str = code_str.replace("\"","")
+    store_str = store_str.strip()
+    print(store_str)
+
+    #is_lazy use as a flag indicate lazy loading machanism which return only store_id, store_type, lat, long 
+    #reducing data needed to visuallize the store in large scale
+    #expected to be Boolean, it can be anything(not None e.g., 0 ,"" (empty String)) or None
+    is_lazy = request.GET.get("lazy", "")
+    is_lazy = is_lazy.replace("\"","")
+    print(is_lazy)
+
+    #coordinates use to load store up close in full detail
+    #expected to be in format "{lat},{long}" such as "13.012,100.123"
+    coordinates = request.GET.get("coordinates", "") 
+    coordinates = coordinates.replace("\"","")
+    print(coordinates)
+
+    if is_lazy:
+        pass
+    else:
+        pass
+
+    result = [
+                {
+            "id": 94,
+            "tel": "02-4470430",
+            "fax": None,
+            "lat": 13.7935949,
+            "long": 100.4753561,
+            "lng": 100.4753561,
+            "store_type_id": 1,
+            "name": "\u0e1a\u0e32\u0e07\u0e01\u0e23\u0e27\u0e22",
+            "address": "\u0e40\u0e25\u0e02\u0e17\u0e35\u0e48 45\/17 \u0e2b\u0e21\u0e39\u0e48\u0e17\u0e35\u0e48 6 \u0e16\u0e19\u0e19\u0e40\u0e17\u0e2d\u0e14\u0e1e\u0e23\u0e30\u0e40\u0e01\u0e35\u0e22\u0e23\u0e15\u0e34 \u0e15\u0e33\u0e1a\u0e25\u0e27\u0e31\u0e14\u0e0a\u0e25\u0e2d \u0e2d\u0e33\u0e40\u0e20\u0e2d\u0e1a\u0e32\u0e07\u0e01\u0e23\u0e27\u0e22 \u0e08\u0e31\u0e07\u0e2b\u0e27\u0e31\u0e14\u0e19\u0e19\u0e17\u0e1a\u0e38\u0e23\u0e35"
+        },
+        {
+            "id": 93,
+            "tel": "02-599-9023-4, 7",
+            "fax": None,
+            "lat": 13.961283,
+            "long": 100.680863,
+            "lng": 100.680863,
+            "store_type_id": 1,
+            "name": "\u0e25\u0e32\u0e14\u0e2a\u0e27\u0e32\u0e22",
+            "address": "\u0e40\u0e25\u0e02\u0e17\u0e35\u0e4853\/16 \u0e2b\u0e21\u0e39\u0e48\u0e17\u0e35\u0e485 \u0e15\u0e33\u0e1a\u0e25\u0e25\u0e32\u0e14\u0e2a\u0e27\u0e32\u0e22 \u0e2d.\u0e25\u0e33\u0e25\u0e39\u0e01\u0e01\u0e32 \u0e08.\u0e1b\u0e17\u0e38\u0e21\u0e18\u0e32\u0e19\u0e35   12150."
+        },
+    ]
+
+    return JsonResponse(result, safe=False)
