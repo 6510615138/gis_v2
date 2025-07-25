@@ -137,8 +137,6 @@ GitHub.sublime-settings
 !.vscode/extensions.json 
 .history
 
-
-
 RESTapi/migrations/0002_authgroup_authgrouppermissions_authpermission_and_more.py
 data/
 inspect.txt
