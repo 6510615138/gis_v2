@@ -1,4 +1,5 @@
 
+from RESTapi.store import findStore
 from .ProvinceSearch import *
 from .MapBorderLoad import *
 
@@ -129,9 +130,17 @@ def get_ev(request):
 
 
 def get_store(request):
-    code_str = request.GET.get("code", "")
-    code_str = code_str.replace("\"","")
-    print(code_str)
+    #request body consist of the following fields
+    # - area_code
+    # - store
+    # - lazy
+    # - coordinates
+
+
+    #area_code is the code specify the area such as {10:Bangkok}
+    area_code_str = request.GET.get("area_code", "")
+    area_code_str = area_code_str.replace("\"","")
+    print(area_code_str)
 
     #store_str use as a filter for query the store by store franchise name 
     #expected to be string seperated be comma in format "store1,store2,store3" such as "Makro,7-11,Lawson"
@@ -163,10 +172,9 @@ def get_store(request):
     #         'TescoHyper'
     #         'Makro'
     # ]
-    
-    store_str = request.GET.get("store", "")
-    store_str = code_str.replace("\"","")
-    store_str = store_str.strip()
+    store_str = request.GET.get("store", "")  #get "store" from request double qoutes if any.
+    store_str = store_str.replace("\"","") #remove double qoutes if any.
+    store_str = store_str.strip() #remove leading and trailing white spaces
     print(store_str)
 
     #is_lazy use as a flag indicate lazy loading machanism which return only store_id, store_type, lat, long 
@@ -176,40 +184,18 @@ def get_store(request):
     is_lazy = is_lazy.replace("\"","")
     print(is_lazy)
 
-    #coordinates use to load store up close in full detail
-    #expected to be in format "{lat},{long}" such as "13.012,100.123"
-    coordinates = request.GET.get("coordinates", "") 
-    coordinates = coordinates.replace("\"","")
-    print(coordinates)
 
+ 
     if is_lazy:
         pass
     else:
-        pass
+        #coordinates use to load store up close in full detail
+        #expected to be in format "{lat},{long}" such as "13.012,100.123"
+        coordinates = request.GET.get("coordinates", "") 
+        coordinates = coordinates.replace("\"","")
+        print(coordinates)
 
-    result = [
-                {
-            "id": 94,
-            "tel": "02-4470430",
-            "fax": None,
-            "lat": 13.7935949,
-            "long": 100.4753561,
-            "lng": 100.4753561,
-            "store_type_id": 1,
-            "name": "\u0e1a\u0e32\u0e07\u0e01\u0e23\u0e27\u0e22",
-            "address": "\u0e40\u0e25\u0e02\u0e17\u0e35\u0e48 45\/17 \u0e2b\u0e21\u0e39\u0e48\u0e17\u0e35\u0e48 6 \u0e16\u0e19\u0e19\u0e40\u0e17\u0e2d\u0e14\u0e1e\u0e23\u0e30\u0e40\u0e01\u0e35\u0e22\u0e23\u0e15\u0e34 \u0e15\u0e33\u0e1a\u0e25\u0e27\u0e31\u0e14\u0e0a\u0e25\u0e2d \u0e2d\u0e33\u0e40\u0e20\u0e2d\u0e1a\u0e32\u0e07\u0e01\u0e23\u0e27\u0e22 \u0e08\u0e31\u0e07\u0e2b\u0e27\u0e31\u0e14\u0e19\u0e19\u0e17\u0e1a\u0e38\u0e23\u0e35"
-        },
-        {
-            "id": 93,
-            "tel": "02-599-9023-4, 7",
-            "fax": None,
-            "lat": 13.961283,
-            "long": 100.680863,
-            "lng": 100.680863,
-            "store_type_id": 1,
-            "name": "\u0e25\u0e32\u0e14\u0e2a\u0e27\u0e32\u0e22",
-            "address": "\u0e40\u0e25\u0e02\u0e17\u0e35\u0e4853\/16 \u0e2b\u0e21\u0e39\u0e48\u0e17\u0e35\u0e485 \u0e15\u0e33\u0e1a\u0e25\u0e25\u0e32\u0e14\u0e2a\u0e27\u0e32\u0e22 \u0e2d.\u0e25\u0e33\u0e25\u0e39\u0e01\u0e01\u0e32 \u0e08.\u0e1b\u0e17\u0e38\u0e21\u0e18\u0e32\u0e19\u0e35   12150."
-        },
-    ]
+        pass
+    result = findStore(area_code = area_code_str)
 
     return JsonResponse(result, safe=False)
