@@ -8,6 +8,8 @@ INSTALLED_APPS = [
     "corsheaders",
     'rest_framework',
     'RESTapi',
+    'django_extensions',
     'Page',
-    'django_extensions'
+    'GeoLocation',
+    'Factory'
 ]
