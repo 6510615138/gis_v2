@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from .utils import get_polygon_coordinates_detailed
 from .models import Province, District, Subdistrict
 from django.db.models import Case, When, IntegerField
 
@@ -126,3 +127,21 @@ class SubdistrictSearchByProvince(APIView):
             matched = matched.filter(name__icontains=name)[:max_result]
 
         return Response(list(matched.values("code", "name")))
+
+class GetCoordinatesAPIView(APIView):
+    def get(self, request):
+        code_str = request.GET.get("code", "")
+        code_str = code_str.replace("\"", "")
+        print(f"coordinate of code: {code_str}")
+
+        if not code_str:
+            return Response({"error": "Empty request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            code_list = [int(code.strip()) for code in code_str.split(',')]
+        except ValueError:
+            return Response({"error": "Bad request"}, status=status.HTTP_400_BAD_REQUEST)
+
+        print(f"lst: {code_list} ({type(code_list)})")
+        geojson = get_polygon_coordinates_detailed(code_list)
+        return Response(geojson, status=status.HTTP_200_OK)
