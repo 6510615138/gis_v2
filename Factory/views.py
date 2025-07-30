@@ -8,7 +8,7 @@ from .utils import find_factory_from_code
 class FactorySearchAPIView(APIView):
     def get(self, request):
         code_str = request.GET.get("area_code", "").replace("\"", "")
-        factory_type = request.GET.get("type", "").replace("\"", "")
+        factory_type = request.GET.get("factory_type", "").replace("\"", "")
 
         if not code_str:
             return Response({"error": "Empty request"}, status=status.HTTP_400_BAD_REQUEST)

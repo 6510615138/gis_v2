@@ -3,7 +3,7 @@ from django.db import models
 class FactoryCoordinates(models.Model):
     registration_num = models.TextField(primary_key=True)
     name = models.TextField(blank=True, null=True)
-    type = models.FloatField(blank=True, null=True)
+    type = models.TextField(blank=True, null=True)
     standard = models.TextField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     subdistrict = models.TextField(blank=True, null=True)
@@ -22,8 +22,8 @@ class FactoryCoordinates(models.Model):
     status = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
-        db_table = 'factory_coordinates'
+        managed = True
+        db_table = 'factory_coordinates2'
 
 
 class FactoryType(models.Model):
@@ -35,5 +35,5 @@ class FactoryType(models.Model):
     class3 = models.TextField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'factory_type'

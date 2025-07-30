@@ -9,37 +9,6 @@ from django.db.models import CharField
 from django.db.models.functions import Cast
 from rest_framework import serializers
 
-def find_factory_from_code_coor(codes):
-    if not codes:
-        return []
-
-    geojson = get_union_coordinates(codes)  # return GeoJSON geometry string
-
-    # print(geojson)
-    json_dict = json.loads(geojson)
-    polygon = shape(json_dict)  # convert GeoJSON to shapely Polygon
-
-    factories = FactoryCoordinates.objects.all()
-    matched_factories = []
-
-    error = 0
-    for factory in factories:
-        long = factory.long
-        lat = factory.lat
-        try:
-            point = Point(lat,long) 
-            if polygon.contains(point):
-                factory_data = list(FactoryCoordinates.objects.values("registration_num","name", "lat", "long"))
-                matched_factories.append(factory_data)
-        except Exception as e:
-            error += 1
-            continue
-    print(f"Error count: {error}")
-    print(f"Matched factories: {len(matched_factories)}")
-    print(matched_factories)
-    return matched_factories
-
-
 
 def find_factory_from_code(codes,factory_type):
     if not codes:
@@ -73,9 +42,9 @@ def find_factory_from_code(codes,factory_type):
         Q(district__in=area['district']) |
         Q(subdistrict__in=area['subdistrict'])
     ).distinct()
-
+    print(f"type = {factory_type}")
     factories = factories.annotate(type_str=Cast('type', CharField())
-    ).filter(type_str__startswith=factory_type)
+    ).filter(type_str__endswith=factory_type)
 
     matched_factories = []
 
@@ -83,6 +52,7 @@ def find_factory_from_code(codes,factory_type):
         matched_factories.append({
             "registration_num": factory.registration_num,
             "name": factory.name,
+            "type" : factory.type,
             "lat": factory.lat,
             "long": factory.lng
         })
