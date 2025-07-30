@@ -11,5 +11,6 @@ INSTALLED_APPS = [
     'django_extensions',
     'Page',
     'GeoLocation',
-    'Factory'
+    'Factory',
+    'Store'
 ]

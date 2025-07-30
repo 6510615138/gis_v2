@@ -19,8 +19,8 @@ from django.contrib import admin
 from django.urls import path,include
 
 urlpatterns = [
+    path("api/",include("GeoLocation.urls")),
     path("api/",include("Factory.urls")),
-    path("api",include("RESTapi.urls")),
     path('admin/', admin.site.urls),
     path("",include("Page.urls")),
 ]
